@@ -29,6 +29,7 @@
             var colour = {
                 red: 'red',
                 blue: 'blue',
+                green: 'green',
                 white: 'white'
             }
             
@@ -55,6 +56,38 @@
                 clear();
                 draw(data);
             });
+            
+            /**
+             * Keyboard Interaction
+             */
+             var current_orientation = '';
+             $('body').keydown(function (data) {
+                 var up = [87, 38];
+                 var down = [83, 40];
+                 var right = [39, 68];
+                 var left = [37, 65];
+                 
+                 var key = data.which;
+                 
+                 if (_.include(up, key)) {
+                     orientation = 'N';
+                 } else if (_.include(down, key)) {
+                     orientation = 'S';
+                 } else if (_.include(left, key)) {
+                     orientation = 'W';
+                 } else if (_.include(right, key)) {
+                     orientation = 'E';
+                 }
+                 
+                 if (orientation != current_orientation) {
+                     current_orientation = orientation;
+                     socket.emit('direction-update', current_orientation);
+                 }
+             });
+             
+             $('body').keyup(function (data) {
+                 socket.emit('direction-update', '');
+             });
         });
         </script>
     </head>
