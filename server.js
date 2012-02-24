@@ -67,14 +67,32 @@ var Entity = function(pos, team, npc) {
         direction = {x: 0, y: 0};
         
         switch (this.orientation) {
-            case 'left': direction.x -= WALK_SPEED; break;
-            case 'right': direction.x += WALK_SPEED; break;
-            case 'up': direction.y -= WALK_SPEED; break;
-            case 'down': direction.y += WALK_SPEED; break;
+            case 'left': this._walk('x', -WALK_SPEED); break;
+            case 'right': this._walk('x', WALK_SPEED); break;
+            case 'up': this._walk('y', -WALK_SPEED); break;
+            case 'down': this._walk('y', WALK_SPEED); break;
         }
+    }
 
-        this.pos.x += direction.x;
-        this.pos.y += direction.y;
+    this._walk = function(axis, speed) {
+        switch(axis) {
+            case 'x':
+                this.pos.x += speed;
+                if (this.pos.x < 0) {
+                    this.pos.x = MAX.x;
+                } else if (this.pos.x > MAX.x) {
+                    this.pos.x = 0;
+                }
+                break;
+            case 'y':
+                this.pos.y += speed;
+                if (this.pos.y < 0) {
+                    this.pos.y = MAX.y;
+                } else if (this.pos.y > MAX.y) {
+                    this.pos.y = 0;
+                }
+                break;
+        }
     }
 }
 
