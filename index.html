@@ -39,12 +39,13 @@
             
             var draw = function (players) {
                 _.each(players, function (player) {
-                    var x = player.pos.x;
-                    var y = player.pos.y;
+                    var size = 20;
+
+                    var x = player.pos.x - size/2;
+                    var y = player.pos.y - size/2;
                     
                     var team = player.team;
                     
-                    var size = 20;
                     
                     context.fillStyle = colour[team];
                     context.strokeStyle = colour[team];
