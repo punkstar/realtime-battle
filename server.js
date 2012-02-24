@@ -5,14 +5,18 @@ var TEAM_COUNT = 10; // Number of entities on each team
 // Globals
 var id = 0;
 
-var app = require('express').createServer()
-  , io = require('socket.io').listen(app);
+var express = require('express');
+var app = express.createServer()
+var io = require('socket.io').listen(app);
+
+app.configure(function() {
+  app.use(express.static(__dirname + '/public'));
+});
 
 app.listen(8080);
 
 app.get('/', function (req, res) {
-    //TODO serve up the template file
-    //res.sendfile(__dirname + '/index.html');
+    res.sendfile(__dirname + '/index.html');
 });
 
 io.sockets.on('connection', function (socket) {

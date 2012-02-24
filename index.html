@@ -1,0 +1,72 @@
+<html>
+    <head>
+        <title>BATTLE!</title>
+        
+        <style type="text/css">
+        #battle {
+            border: 1px solid #eee;
+            margin: auto;
+            margin-top: 25px;
+            display: block;
+            
+            background: #86C67C;
+            
+            -webkit-box-shadow: 0px 10px 10px #ddd;
+            -moz-box-shadow: 0px 10px 10px #ddd;
+            box-shadow: 0px 10px 10px #ddd;
+        }
+        </style>
+        
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script type="text/javascript" src="underscore.js"></script>
+        <script type="text/javascript">
+        $(function () {
+            var canvas = document.getElementById('battle');
+            var context = canvas.getContext('2d');
+            
+            var colour = {
+                red: 'red',
+                blue: 'blue',
+                white: 'white'
+            }
+            
+            var clear = function () {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            var draw = function (players) {
+                _.each(players, function (player) {
+                    var x = player.pos.x;
+                    var y = player.pos.y;
+                    
+                    var team = player.team;
+                    
+                    var size = 20;
+                    
+                    context.fillStyle = colour[team];
+                    context.strokeStyle = colour[team];
+                    context.fillRect(x, y, size, size);
+                });
+            }
+            
+            setInterval(function () {
+                clear();
+                draw([{
+                        id: 'player_1',
+                        pos: { x: Math.random() * 700, y: Math.random() * 500},
+                        team: 'blue'
+                    }, {
+                        id: 'player_2',
+                        pos: { x: Math.random() * 700, y: Math.random() * 500},
+                        team: 'red'
+                    }
+                ]);
+            }, 1000/30);
+        });
+        </script>
+    </head>
+    <body>
+        <canvas id="battle" width="700" height="500"></canvas>
+    </body>
+</html>
+
