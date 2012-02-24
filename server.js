@@ -49,6 +49,7 @@ var Entity = function(pos, team, npc) {
     this.id = id++;
     this.pos = pos;
     this.team = team;
+    this.npc = npc;
     switch (team) {
         case 'red': this.orientation = 'left'; break;
         case 'blue': this.orientation = 'right'; break;
@@ -75,7 +76,6 @@ var Entity = function(pos, team, npc) {
         this.pos.x += direction.x;
         this.pos.y += direction.y;
     }
-    this.npc = npc;
 }
 
 function createBots() {
