@@ -3,6 +3,7 @@ var TEAMS = ['red', 'blue'];
 var TEAM_COUNT = 10; // Number of entities on each team
 var WALK_SPEED = 1;
 var FPS = 30;
+var MAX = {x: 700, y: 500};
 
 // Globals
 var id = 0;
@@ -82,7 +83,7 @@ function createBots() {
 
     for (var i in TEAMS) {
         for (var j = 0; j < TEAM_COUNT; j++) {
-            bots.push(new Entity({x:Math.random() * 700, y:Math.random() * 500}, TEAMS[i], true));
+            bots.push(new Entity({x:Math.random() * MAX.x, y:Math.random() * MAX.y}, TEAMS[i], true));
         }
     }
 
