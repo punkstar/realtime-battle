@@ -47,7 +47,7 @@ function moveEveryone() {
 
 function gameLoop() {
     moveEveryone();
-    console.log(entities);
+    io.sockets.emit('update', {entities: entities}); 
     setTimeout(gameLoop, 500); 
 }
 
@@ -55,7 +55,6 @@ function gameLoop() {
 // Create all the entities in the game (initially a bunch of bots)
 var entities = createBots();
 
-console.log(entities);
 // Enter gameloop
 gameLoop();
 
