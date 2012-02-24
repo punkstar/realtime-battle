@@ -1,6 +1,7 @@
 // Constants
 var TEAMS = ['red', 'blue'];
 var TEAM_COUNT = 10; // Number of entities on each team
+var WALK_SPEED = 1;
 
 // Globals
 var id = 0;
@@ -27,6 +28,32 @@ var Entity = function(pos, team) {
     this.id = id++;
     this.pos = pos;
     this.team = team;
+    switch (team) {
+        case 'red': this.orientation = 'left'; break;
+        case 'blue': this.orientation = 'right'; break;
+    }
+    this.action = 'walk';
+
+    this.update = function() {
+         switch(this.action) {
+             case 'walk': this.walk(); break;
+         }
+    }
+
+    // ACTIONS
+    this.walk = function() {
+        direction = {x: 0, y: 0};
+        
+        switch (this.orientation) {
+            case 'left': direction.x -= WALK_SPEED; break;
+            case 'right': direction.x += WALK_SPEED; break;
+            case 'up': direction.y += WALK_SPEED; break;
+            case 'down': direction.y -= WALK_SPEED; break;
+        }
+
+        this.pos.x += direction.x;
+        this.pos.y += direction.y;
+    }
 }
 
 function createBots() {
@@ -41,16 +68,14 @@ function createBots() {
     return bots;
 }
 
-function moveEveryone() {
+function updateEntities() {
     for (var i in entities) {
-        entities[i].pos.x += Math.random();
-        entities[i].pos.y += Math.random();
+        entities[i].update();
     }
 }
 
-
 function gameLoop() {
-    moveEveryone();
+    updateEntities();
     io.sockets.emit('update', entities); 
     setTimeout(gameLoop, 1000/30); 
 }
