@@ -19,8 +19,10 @@
         
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
         <script type="text/javascript" src="underscore.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
         $(function () {
+            var socket = io.connect('http://localhost');
             var canvas = document.getElementById('battle');
             var context = canvas.getContext('2d');
             
@@ -35,7 +37,7 @@
             }
             
             var draw = function (players) {
-                _.each(players, function (player) {
+                _.each(players.entities, function (player) {
                     var x = player.pos.x;
                     var y = player.pos.y;
                     
@@ -49,19 +51,10 @@
                 });
             }
             
-            setInterval(function () {
+            socket.on('update', function (data) {
                 clear();
-                draw([{
-                        id: 'player_1',
-                        pos: { x: Math.random() * 700, y: Math.random() * 500},
-                        team: 'blue'
-                    }, {
-                        id: 'player_2',
-                        pos: { x: Math.random() * 700, y: Math.random() * 500},
-                        team: 'red'
-                    }
-                ]);
-            }, 1000/30);
+                draw(data);
+            });
         });
         </script>
     </head>

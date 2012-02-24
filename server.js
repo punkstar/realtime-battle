@@ -23,9 +23,9 @@ io.sockets.on('connection', function (socket) {
     io.sockets.emit('A new player has joined.'); 
 });
 
-var Entity = function(position, team) {
+var Entity = function(pos, team) {
     this.id = id++;
-    this.position = position;
+    this.pos = pos;
     this.team = team;
 }
 
@@ -43,8 +43,8 @@ function createBots() {
 
 function moveEveryone() {
     for (var i in entities) {
-        entities[i].position.x += Math.random();
-        entities[i].position.y += Math.random();
+        entities[i].pos.x += Math.random();
+        entities[i].pos.y += Math.random();
     }
 }
 
@@ -52,7 +52,7 @@ function moveEveryone() {
 function gameLoop() {
     moveEveryone();
     io.sockets.emit('update', {entities: entities}); 
-    setTimeout(gameLoop, 500); 
+    setTimeout(gameLoop, 1000/30); 
 }
 
 
