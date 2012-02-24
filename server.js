@@ -51,7 +51,7 @@ function moveEveryone() {
 
 function gameLoop() {
     moveEveryone();
-    io.sockets.emit('update', {entities: entities}); 
+    io.sockets.emit('update', entities); 
     setTimeout(gameLoop, 1000/30); 
 }
 
