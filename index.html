@@ -33,23 +33,44 @@
                 white: 'white'
             }
             
+            var addMessage = function (message) {
+                $('#messages').prepend($('<li />').html(message));
+                $('#messages li:nth-child(n+15)').remove();
+            }
+            
+            socket.on('message', function (data) {
+                addMessage(data);
+            })
+            
             var clear = function () {
                 context.clearRect(0, 0, canvas.width, canvas.height);
             }
             
             var draw = function (players) {
                 _.each(players, function (player) {
-                    var size = 20;
-
-                    var x = player.pos.x - size/2;
-                    var y = player.pos.y - size/2;
+                    var size = 5;
                     
-                    var team = player.team;
-                    
+                    if (player.dead) {
+                        var team = colour.white;
+                        var x = this.x;
+                        var y = this.y;
+                    } else {
+                        var team = player.team;
+                        var x = player.pos.x - size/2;
+                        var y = player.pos.y - size/2;
+                    }
                     
                     context.fillStyle = colour[team];
                     context.strokeStyle = colour[team];
-                    context.fillRect(x, y, size, size);
+                    
+                    context.beginPath();
+                    context.arc(x, y, size, 0, Math.PI * 2, true); 
+                    context.closePath();
+                    context.fill();
+                    
+                    context.textAlign = 'center';
+                    context.textBaseline = 'top';
+                    context.fillText("#" + player.id, x, y + size);
                 });
             }
             
@@ -70,6 +91,8 @@
                  
                  var key = data.which;
                  
+                 var orientation;
+                 
                  if (_.include(up, key)) {
                      orientation = 'N';
                  } else if (_.include(down, key)) {
@@ -80,9 +103,8 @@
                      orientation = 'E';
                  }
                  
-                 if (orientation != current_orientation) {
-                     current_orientation = orientation;
-                     socket.emit('direction-update', current_orientation);
+                 if (orientation) {
+                     socket.emit('direction-update', orientation);
                  }
              });
              
@@ -93,7 +115,8 @@
         </script>
     </head>
     <body>
-        <canvas id="battle" width="700" height="500"></canvas>
+        <canvas id="battle" width="800" height="600"></canvas>
+        <ul id="messages"></ul>
     </body>
 </html>
 

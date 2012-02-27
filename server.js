@@ -1,9 +1,9 @@
 // Constants
 var TEAMS = ['red', 'blue'];
 var TEAM_COUNT = 10; // Number of entities on each team
-var WALK_SPEED = 1;
+var WALK_SPEED = 5;
 var FPS = 30;
-var MAX = {x: 700, y: 500};
+var MAX = {x: 800, y: 600};
 
 // Globals
 var id = 0;
@@ -11,6 +11,7 @@ var id = 0;
 var express = require('express');
 var app = express.createServer()
 var io = require('socket.io').listen(app);
+var _ = require('./public/underscore.js')._;
 
 io.set('log level', 1); // Reduce the log messages
 
@@ -25,9 +26,9 @@ app.get('/', function (req, res) {
 });
 
 io.sockets.on('connection', function (socket) {
-    socket.emit('A new player has joined.'); 
+    socket.emit('message', 'Welcome to the game'); 
     
-    var player = new Entity({x: 10, y: 10}, 'green', false);
+    var player = new Entity({ x: 10, y: 10 }, 'green', false);
     entities.push(player);
     
     socket.on('direction-update', function (data) {
@@ -50,27 +51,45 @@ var Entity = function(pos, team, npc) {
     this.pos = pos;
     this.team = team;
     this.npc = npc;
+    this.dead = false
     switch (team) {
-        case 'red': this.orientation = 'left'; break;
+        case 'red':  this.orientation = 'left';  break;
         case 'blue': this.orientation = 'right'; break;
     }
     this.action = 'walk';
 
     this.update = function() {
-         switch(this.action) {
-             case 'walk': this.walk(); break;
-         }
+        if (this.npc && this.isColliding()) {
+            this.dead = true;
+        } else {
+            switch(this.action) {
+                case 'walk': this.walk(); break;
+            }
+        }
+    }
+
+    this.isColliding = function () {
+        return _.any(entities, function (entity) {
+            if (entity.id == this.id) return false;
+            
+            var d_x = entity.pos.x - this.pos.x;
+            var d_y = entity.pos.y - this.pos.y;
+            
+            var d = Math.sqrt(Math.pow(d_x, 2) + Math.pow(d_y, 2));
+            
+            return d <= 10;
+        }, this);
     }
 
     // ACTIONS
     this.walk = function() {
-        direction = {x: 0, y: 0};
+        direction = { x: 0, y: 0 };
         
         switch (this.orientation) {
-            case 'left': this._walk('x', -WALK_SPEED); break;
-            case 'right': this._walk('x', WALK_SPEED); break;
-            case 'up': this._walk('y', -WALK_SPEED); break;
-            case 'down': this._walk('y', WALK_SPEED); break;
+            case 'left':  this._walk('x', -WALK_SPEED); break;
+            case 'right': this._walk('x',  WALK_SPEED); break;
+            case 'up':    this._walk('y', -WALK_SPEED); break;
+            case 'down':  this._walk('y',  WALK_SPEED); break;
         }
     }
 
@@ -97,20 +116,29 @@ var Entity = function(pos, team, npc) {
 }
 
 function createBots() {
-    var bots = new Array();
-
     for (var i in TEAMS) {
         for (var j = 0; j < TEAM_COUNT; j++) {
-            bots.push(new Entity({x:Math.random() * MAX.x, y:Math.random() * MAX.y}, TEAMS[i], true));
+            createBot(TEAMS[i]);
         }
     }
+}
 
-    return bots;
+function createBot(team) {
+    var e = new Entity({ x: Math.random() * MAX.x, y: Math.random() * MAX.y }, team, true);
+    entities.push(e);
 }
 
 function updateEntities() {
     for (var i in entities) {
-        entities[i].update();
+        var entity = entities[i];
+        entity.update();
+        
+        if (entity.dead) {
+            var team = entity.team; team = team.charAt(0).toUpperCase() + team.slice(1);
+            createBot(entity.team);
+            io.sockets.emit('message', 'Current <strong>Bot #' + i + '</strong> (' + team + ' team) has died'); 
+            entities.splice(i,1);
+        }
     }
 }
 
@@ -122,7 +150,8 @@ function gameLoop() {
 
 
 // Create all the entities in the game (initially a bunch of bots)
-var entities = createBots();
+var entities = [];
+createBots();
 
 // Enter gameloop
 gameLoop();
